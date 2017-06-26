@@ -10,8 +10,15 @@ import math
 from numpy import histogram as nphist
 import codecs
 import sys
+import cv2
 reload(sys)  
 sys.setdefaultencoding('utf8')
+
+
+cascPath = "haarcascade_frontalface_default.xml"
+
+# Create the haar cascade
+faceCascade = cv2.CascadeClassifier(cascPath)
 
 #Create a engine for connecting to SQLite3.
 #Assuming salaries.db is in your app root folder
@@ -20,6 +27,42 @@ e = create_engine('sqlite:///salaries.db')
 
 app = Flask(__name__)
 api = Api(app)
+
+def add_hat(x,y,w,h, hat_type, background, foreground):
+    (width_b, height_b) = background.size   
+    (width_f, height_f) = foreground.size
+
+    if(hat_type == "FedoraHat"):
+        hat_point_left = (187,314)
+        hat_point_right = (638,314)
+        hat_real_width = 638-187
+    elif (hat_type == "SantaHat"):
+        hat_point_left = (18,195)
+        hat_point_right = (295,195)
+        hat_real_width = 295-18
+    elif (hat_type == "Glasses"):
+        hat_point_left = (0, 157)
+        hat_point_right = (442,157)
+        hat_real_width = 442 - 0
+
+
+    if(hat_type == "FedoraHat" or hat_type == "SantaHat"):
+        width_face = w
+        proportion_width = (width_face)/(hat_real_width*1.0)
+        new_height =(int) (height_f*proportion_width)
+        new_width = (int) (width_f*proportion_width);
+        new_hat_point_left = ((int)(hat_point_left[0]*proportion_width),(int)(hat_point_left[1]*proportion_width))
+        resized_foreground = foreground.resize((new_width,new_height))
+        background.paste(resized_foreground, (x - new_hat_point_left[0], y - new_hat_point_left[1] ), resized_foreground)
+    elif(hat_type == "Glasses"):
+        width_face = w
+        proportion_width = (width_face)/(hat_real_width*1.0)
+        new_height =(int) (height_f*proportion_width)
+        new_width = (int) (width_f*proportion_width);
+        new_hat_point_left = ((int)(hat_point_left[0]*proportion_width),(int)(hat_point_left[1]*proportion_width))
+        resized_foreground = foreground.resize((new_width,new_height))
+        background.paste(resized_foreground, (x - new_hat_point_left[0], y + h/2 + h/10 - new_hat_point_left[1] ), resized_foreground)
+    return background
 
 def iacircle(s, r, c):
         
@@ -170,7 +213,7 @@ class Departments_Meta(Resource):
         f.write(request.data)
         f.close()
         img = Image.open('imageT.jpg')
-	img = iargb2gray(img)
+        img = iargb2gray(img)
         imgdft = fft2(img)
         mag = abs(imgdft)
         pct25 = iapercentile(mag , 25)
@@ -200,7 +243,7 @@ def iafftshift(f):
 
 class LarguraRuido(Resource):
     def post(self):
-	f = codecs.open('imageT.jpg', 'wb')
+        f = codecs.open('imageT.jpg', 'wb')
         f.write(request.data)
         f.close()
         img = Image.open('imageT.jpg')
@@ -240,15 +283,15 @@ class Mascara(Resource):
         f.write(request.data)
         f.close()
         img = Image.open('imageT.jpg')
-	fftimg = fft2(img)
-	img = iadftview(fftimg)
-	auxImg = Image.fromarray(img)
-	width, height = auxImg.size
-	mask = iacircle(img.shape,35,[height/2,width/2])
-	mask = iaptrans(mask, np.array(mask.shape)/2).astype(bool)
-	filtered = fftimg*mask
-	img = iadftview(filtered)
-	img = Image.fromarray(img)
+    	fftimg = fft2(img)
+    	img = iadftview(fftimg)
+    	auxImg = Image.fromarray(img)
+    	width, height = auxImg.size
+    	mask = iacircle(img.shape,35,[height/2,width/2])
+    	mask = iaptrans(mask, np.array(mask.shape)/2).astype(bool)
+    	filtered = fftimg*mask
+    	img = iadftview(filtered)
+    	img = Image.fromarray(img)
         img.save('mask.jpg')
         return 'ok'
 
@@ -282,9 +325,9 @@ class Filtragem(Resource):
         f.write(request.data)
         f.close()
         img = Image.open('imageT.jpg')
-	img = normalize(img).astype('uint8')
-	img = iaidft(img)
-	img = normalize(np.abs(img)).astype('uint8')
+    	img = normalize(img).astype('uint8')
+    	img = iaidft(img)
+    	img = normalize(np.abs(img)).astype('uint8')
         img = Image.fromarray(img)
         img.save('ahu-filtered.jpg')
         return 'ok'
@@ -347,6 +390,108 @@ class Notch(Resource):
 		img = Image.fromarray(img)
 		img.save('notch.jpg')
 		return 'ok'
+
+class SantaHat(Resource):
+    def post(self):
+        f = codecs.open('imageT.jpg', 'wb')
+        f.write(request.data)
+        f.close()
+        # Read the image
+        image = cv2.imread('imageT.jpg')
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Detect faces in the image
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30)
+            #flags = cv2.CV_HAAR_SCALE_IMAGE
+        )
+        background = Image.open('imageT.jpg')
+        foreground = Image.open(christmas_hat.png)
+
+        for (x, y, w, h) in faces:
+            img = add_hat(x,y,w,h,"SantaHat", background, foreground);
+        img.save("SantaHat.jpg")
+        return 'ok'
+
+class FedoraHat(Resource):
+    def post(self):
+        f = codecs.open('imageT.jpg', 'wb')
+        f.write(request.data)
+        f.close()
+        # Read the image
+        image = cv2.imread('imageT.jpg')
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Detect faces in the image
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30)
+            #flags = cv2.CV_HAAR_SCALE_IMAGE
+        )
+        background = Image.open('imageT.jpg')
+        foreground = Image.open('Fedora.png')
+
+
+        for (x, y, w, h) in faces:
+            img = add_hat(x,y,w,h,"FedoraHat", background, foreground);
+        img.save("FedoraHat.jpg")
+        return 'ok'            
+
+class Glasses(Resource):
+    def post(self):
+        f = codecs.open('imageT.jpg', 'wb')
+        f.write(request.data)
+        f.close()
+        # Read the image
+        image = cv2.imread('imageT.jpg')
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Detect faces in the image
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30)
+            #flags = cv2.CV_HAAR_SCALE_IMAGE
+        )
+        background = Image.open('imageT.jpg')
+        foreground = Image.open('sunglass.png')
+
+        for (x, y, w, h) in faces:
+            img = add_hat(x,y,w,h,"Glasses", background, foreground);
+        img.save("Glasses.jpg")
+        return 'ok'
+
+class DrawRectangles(Resource):
+    def post(self):
+        f = codecs.open('imageT.jpg', 'wb')
+        f.write(request.data)
+        f.close()
+        # Read the image
+        image = cv2.imread('imageT.jpg')
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Detect faces in the image
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30)
+            #flags = cv2.CV_HAAR_SCALE_IMAGE
+        )
+        background = Image.open('imageT.jpg')
+        foreground = Image.open('sunglass.png')
+
+        for (x, y, w, h) in faces:
+            cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            cv2.rectangle(image, (x, y), (x+w, y+(h/2)), (0, 255, 0), 2)
+        cv2.imwrite("drawrectangles.jpg", image)
+        return 'ok'
 		
 api.add_resource(Departments_Meta, '/compress')
 api.add_resource(AlturaRuido, '/altura')
@@ -356,6 +501,10 @@ api.add_resource(Mascara, '/mascara')
 api.add_resource(Filtragem, '/filtragem')
 api.add_resource(Mf, '/mf')
 api.add_resource(Notch, '/notch')
+api.add_resource(SantaHat, '/santahat')
+api.add_resource(FedoraHat, '/fedorahat')
+api.add_resource(Glasses, '/glasses')
+api.add_resource(DrawRectangles, '/drawrectangles')
 
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=7501)
