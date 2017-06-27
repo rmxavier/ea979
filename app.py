@@ -32,11 +32,11 @@ e = create_engine('sqlite:///salaries.db')
 app = Flask(__name__)
 api = Api(app)
 
-def save_image(request)
+def save_image(request):
     f0 = request.files['file']
     f0.save(secure_filename(input_image_name))
 
-def return_image()
+def return_image():
     send_file(output_image_name, mimetype='image/jpeg') 
 
 def add_hat(x,y,w,h, hat_type, background, foreground):
