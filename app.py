@@ -1,5 +1,6 @@
 from flask import Flask, request
 from flask import json
+from flask import send_file
 from flask_restful import Resource, Api
 from sqlalchemy import create_engine
 from json import dumps
@@ -11,6 +12,7 @@ from numpy import histogram as nphist
 import codecs
 import sys
 import cv2
+from werkzeug import secure_filename
 reload(sys)  
 sys.setdefaultencoding('utf8')
 
@@ -444,11 +446,9 @@ class FedoraHat(Resource):
 
 class Glasses(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        print('Hello world!', file=sys.stderr)
-        print(request.data, file=sys.stderr)
-        f.write(request.data)
-        f.close()
+        f0 = request.files['file']
+        f0.save(secure_filename("imageT.jpg"))
+
         # Read the image
         image = cv2.imread('imageT.jpg')
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -467,7 +467,7 @@ class Glasses(Resource):
         for (x, y, w, h) in faces:
             img = add_hat(x,y,w,h,"Glasses", background, foreground);
         img.save("Glasses.jpg")
-        return 'ok'
+        return send_file("Glasses.jpg", mimetype='image/jpeg') 
 
 class DrawRectangles(Resource):
     def post(self):
