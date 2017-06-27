@@ -445,6 +445,7 @@ class FedoraHat(Resource):
 class Glasses(Resource):
     def post(self):
         f = codecs.open('imageT.jpg', 'wb')
+        print(request.data)
         f.write(request.data)
         f.close()
         # Read the image
