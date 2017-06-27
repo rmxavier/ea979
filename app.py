@@ -296,7 +296,7 @@ class Mascara(Resource):
         return 'ok'
 
 
-class Valle(Resource):
+class Mf(Resource):
     def post(self):
         f = codecs.open('imageT.jpg', 'wb')
         f.write(request.data)
