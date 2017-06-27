@@ -507,5 +507,5 @@ api.add_resource(Glasses, '/glasses')
 api.add_resource(DrawRectangles, '/drawrectangles')
 
 if __name__ == '__main__':
-      app.run(host='0.0.0.0', port=7501)
+      app.run(host='0.0.0.0', port=80)
 
