@@ -204,7 +204,7 @@ def iargb2gray(f):
             value = r * 299.0/1000 + g * 587.0/1000 + b * 114.0/1000
             value = int(value)
             gray.putpixel((x, y), value)
-    return gray	
+    return gray    
 
 
 class Departments_Meta(Resource):
@@ -230,7 +230,7 @@ class Departments_Meta(Resource):
         #img90 = Image.fromarray(np.asarray(ianormalize(np.real(fft2(filtered95)))))
         img75 = img75.transpose(Image.FLIP_LEFT_RIGHT)
         img75.save('hue.png')
-	        
+            
         return 'ok'
 
 def iadftview(F):
@@ -284,7 +284,7 @@ class Mascara(Resource):
         f.close()
         img = Image.open('imageT.jpg')
         fftimg = fft2(img)
-    	img = iadftview(fftimg)
+        img = iadftview(fftimg)
         auxImg = Image.fromarray(img)
         width, height = auxImg.size
         mask = iacircle(img.shape,35,[height/2,width/2])
@@ -325,71 +325,71 @@ class Filtragem(Resource):
         f.write(request.data)
         f.close()
         img = Image.open('imageT.jpg')
-    	img = normalize(img).astype('uint8')
-    	img = iaidft(img)
-    	img = normalize(np.abs(img)).astype('uint8')
+        img = normalize(img).astype('uint8')
+        img = iaidft(img)
+        img = normalize(np.abs(img)).astype('uint8')
         img = Image.fromarray(img)
         img.save('ahu-filtered.jpg')
         return 'ok'
 
 class Notch(Resource):
     def post(self):
-		f = codecs.open('imageT.jpg', 'wb')
-		f.write(request.data)
-		f.close()
-		img = Image.open('imageT.jpg')
-		#img = img.convert('RGB')
-		#img = iargb2gray(img)
-		fftimg = fft2(img)
-		img = iadftview(fftimg)
-		auxImg = Image.fromarray(img)
-		width, height = auxImg.size
+        f = codecs.open('imageT.jpg', 'wb')
+        f.write(request.data)
+        f.close()
+        img = Image.open('imageT.jpg')
+        #img = img.convert('RGB')
+        #img = iargb2gray(img)
+        fftimg = fft2(img)
+        img = iadftview(fftimg)
+        auxImg = Image.fromarray(img)
+        width, height = auxImg.size
 
 
-		notch_mask = img
-		for j in range (1,width):
-			for n in range(1,height):
-				notch_mask[j,n] = 255;
+        notch_mask = img
+        for j in range (1,width):
+            for n in range(1,height):
+                notch_mask[j,n] = 255;
 
-		w = width
-		h = height
+        w = width
+        h = height
 
-		size_w = width/4
-		size_h = 5         
+        size_w = width/4
+        size_h = 5         
 
-		for n in range (int(-size_w/2),int(size_w/2)):
-			for j in range(int(-size_h/2),int(size_h/2)):
-				notch_mask[n+int(w/4),j+int(h/2)] = 0;
-				
-		#for n in range (int(-size_h/2),int(size_h/2)):
-		#	for j in range(int(-size_w/2),int(size_w/2)):
-		#		notch_mask[j-int((h/2)),n+3*int((w/4))] = 0;
-				
+        for n in range (int(-size_w/2),int(size_w/2)):
+            for j in range(int(-size_h/2),int(size_h/2)):
+                notch_mask[n+int(w/4),j+int(h/2)] = 0;
+                
+        #for n in range (int(-size_h/2),int(size_h/2)):
+        #    for j in range(int(-size_w/2),int(size_w/2)):
+        #        notch_mask[j-int((h/2)),n+3*int((w/4))] = 0;
+                
 
-		# size_w = 5
-		# size_h = height*1.5/4   
+        # size_w = 5
+        # size_h = height*1.5/4   
 
-		# for n in range (int(-size_w/2),int(size_w/2)):
-			# for j in range(int(-size_h/2),int(size_h/2)):
-				# notch_mask[j+int(h/4),n+int(w/2)] = 0;
-				
-		# for n in range (int(-size_w/2),int(size_w/2)):
-			# for j in range(int(-size_h/2),int(size_h/2)):
-				# notch_mask[j+3*int((h/4)),n-int(w/2)] = 0;
+        # for n in range (int(-size_w/2),int(size_w/2)):
+            # for j in range(int(-size_h/2),int(size_h/2)):
+                # notch_mask[j+int(h/4),n+int(w/2)] = 0;
+                
+        # for n in range (int(-size_w/2),int(size_w/2)):
+            # for j in range(int(-size_h/2),int(size_h/2)):
+                # notch_mask[j+3*int((h/4)),n-int(w/2)] = 0;
 
-		filtered = fftimg*notch_mask
+        filtered = fftimg*notch_mask
 
-		img = iadftview(filtered)
-		img = Image.fromarray(img)
-		img.save('mask.jpg')
-		return 'ok'
+        img = iadftview(filtered)
+        img = Image.fromarray(img)
+        img.save('mask.jpg')
+        return 'ok'
 
-		#img = normalize(filtered).astype('uint8')
-		img = iaidft(filtered)
-		img = normalize(np.abs(img)).astype('uint8')
-		img = Image.fromarray(img)
-		img.save('notch.jpg')
-		return 'ok'
+        #img = normalize(filtered).astype('uint8')
+        img = iaidft(filtered)
+        img = normalize(np.abs(img)).astype('uint8')
+        img = Image.fromarray(img)
+        img.save('notch.jpg')
+        return 'ok'
 
 class SantaHat(Resource):
     def post(self):
@@ -492,7 +492,7 @@ class DrawRectangles(Resource):
             cv2.rectangle(image, (x, y), (x+w, y+(h/2)), (0, 255, 0), 2)
         cv2.imwrite("drawrectangles.jpg", image)
         return 'ok'
-		
+        
 api.add_resource(Departments_Meta, '/compress')
 api.add_resource(AlturaRuido, '/altura')
 api.add_resource(LarguraRuido, '/largura')
