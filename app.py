@@ -18,6 +18,8 @@ sys.setdefaultencoding('utf8')
 
 
 cascPath = "haarcascade_frontalface_default.xml"
+input_image_name = "input_image.jpg"
+output_image_name = "output_image.jpg"
 
 # Create the haar cascade
 faceCascade = cv2.CascadeClassifier(cascPath)
@@ -29,6 +31,13 @@ e = create_engine('sqlite:///salaries.db')
 
 app = Flask(__name__)
 api = Api(app)
+
+def save_image(request)
+    f0 = request.files['file']
+    f0.save(secure_filename(input_image_name))
+
+def return_image()
+    send_file(output_image_name, mimetype='image/jpeg') 
 
 def add_hat(x,y,w,h, hat_type, background, foreground):
     (width_b, height_b) = background.size   
@@ -178,7 +187,6 @@ def iaptrans(f,t):
 
 
 def ianormalize(f, range=[0,255]):
-    print ("Testeeee")
     f = np.asarray(f)
     range = np.asarray(range)
     if f.dtype.char in ['D', 'F']:
@@ -446,8 +454,7 @@ class FedoraHat(Resource):
 
 class Glasses(Resource):
     def post(self):
-        f0 = request.files['file']
-        f0.save(secure_filename("imageT.jpg"))
+        save_image(request)
 
         # Read the image
         image = cv2.imread('imageT.jpg')
@@ -467,7 +474,7 @@ class Glasses(Resource):
         for (x, y, w, h) in faces:
             img = add_hat(x,y,w,h,"Glasses", background, foreground);
         img.save("Glasses.jpg")
-        return send_file("Glasses.jpg", mimetype='image/jpeg') 
+        return return_image()
 
 class DrawRectangles(Resource):
     def post(self):
