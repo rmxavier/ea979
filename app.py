@@ -176,11 +176,11 @@ def iaptrans(f,t):
 
 
 def ianormalize(f, range=[0,255]):
- 
+    print ("Testeeee")
     f = np.asarray(f)
     range = np.asarray(range)
     if f.dtype.char in ['D', 'F']:
-        raise Exception, 'error: cannot normalize complex data'
+        raise Exception('error: cannot normalize complex data')
     faux = np.ravel(f).astype(float)
     minimum = faux.min()
     maximum = faux.max()
@@ -283,15 +283,15 @@ class Mascara(Resource):
         f.write(request.data)
         f.close()
         img = Image.open('imageT.jpg')
-    	fftimg = fft2(img)
+        fftimg = fft2(img)
     	img = iadftview(fftimg)
-    	auxImg = Image.fromarray(img)
-    	width, height = auxImg.size
-    	mask = iacircle(img.shape,35,[height/2,width/2])
-    	mask = iaptrans(mask, np.array(mask.shape)/2).astype(bool)
-    	filtered = fftimg*mask
-    	img = iadftview(filtered)
-    	img = Image.fromarray(img)
+        auxImg = Image.fromarray(img)
+        width, height = auxImg.size
+        mask = iacircle(img.shape,35,[height/2,width/2])
+        mask = iaptrans(mask, np.array(mask.shape)/2).astype(bool)
+        filtered = fftimg*mask
+        img = iadftview(filtered)
+        img = Image.fromarray(img)
         img.save('mask.jpg')
         return 'ok'
 
