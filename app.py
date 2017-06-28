@@ -222,10 +222,8 @@ def iargb2gray(f):
 
 class Departments_Meta(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
-        img = Image.open('imageT.jpg')
+        save_image(request)
+        img = Image.open(INPUT_IMAGE_NAME())
         img = iargb2gray(img)
         imgdft = fft2(img)
         mag = abs(imgdft)
@@ -244,7 +242,7 @@ class Departments_Meta(Resource):
         img75 = img75.transpose(Image.FLIP_LEFT_RIGHT)
         img75.save('hue.png')
             
-        return 'ok'
+        return return_image()
 
 def iadftview(F):
     FM = iafftshift(np.log10(abs(F)+1))
@@ -256,46 +254,38 @@ def iafftshift(f):
 
 class LarguraRuido(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
-        img = Image.open('imageT.jpg')
+        save_image(request)
+        img = Image.open(INPUT_IMAGE_NAME())
         img = img.convert('RGB')
         img = iargb2gray(img)
         img = ruidoLargura(img)
         img.save('ahu.bmp')
-        return 'ok'
+        return return_image()
 
 class AlturaRuido(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
-        img = Image.open('imageT.jpg')
+        save_image(request)
+        img = Image.open(INPUT_IMAGE_NAME())
         img = img.convert('RGB')
         img = iargb2gray(img)
         img = ruidoAltura(img)
         img.save('ahu.bmp')
-        return 'ok'
+        return return_image()
 
 class AmbosRuido(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
-        img = Image.open('imageT.jpg')
+        save_image(request)
+        img = Image.open(INPUT_IMAGE_NAME())
         img = img.convert('RGB')
         img = iargb2gray(img)
         img = ruidoAmbos(img)
         img.save('ambos.jpg')
-        return 'ok'
+        return return_image()
 
 class Mascara(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
-        img = Image.open('imageT.jpg')
+        save_image(request)
+        img = Image.open(INPUT_IMAGE_NAME())
         fftimg = fft2(img)
         img = iadftview(fftimg)
         auxImg = Image.fromarray(img)
@@ -306,15 +296,13 @@ class Mascara(Resource):
         img = iadftview(filtered)
         img = Image.fromarray(img)
         img.save('mask.jpg')
-        return 'ok'
+        return return_image()
 
 
 class Mf(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
-        img = Image.open('imageT.jpg')
+        save_image(request)
+        img = Image.open(INPUT_IMAGE_NAME())
         #img = img.convert('RGB')
         #img = iargb2gray(img)
         fftimg = fft2(img)
@@ -329,28 +317,24 @@ class Mf(Resource):
         img = normalize(np.abs(img)).astype('uint8')
         img = Image.fromarray(img)
         img.save('mf.jpg')
-        return 'ok'
+        return return_image()
 
 
 class Filtragem(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
-        img = Image.open('imageT.jpg')
+        save_image(request)
+        img = Image.open(INPUT_IMAGE_NAME())
         img = normalize(img).astype('uint8')
         img = iaidft(img)
         img = normalize(np.abs(img)).astype('uint8')
         img = Image.fromarray(img)
         img.save('ahu-filtered.jpg')
-        return 'ok'
+        return return_image()
 
 class Notch(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
-        img = Image.open('imageT.jpg')
+        save_image(request)
+        img = Image.open(INPUT_IMAGE_NAME())
         #img = img.convert('RGB')
         #img = iargb2gray(img)
         fftimg = fft2(img)
@@ -395,22 +379,20 @@ class Notch(Resource):
         img = iadftview(filtered)
         img = Image.fromarray(img)
         img.save('mask.jpg')
-        return 'ok'
+        return return_image()
 
         #img = normalize(filtered).astype('uint8')
         img = iaidft(filtered)
         img = normalize(np.abs(img)).astype('uint8')
         img = Image.fromarray(img)
         img.save('notch.jpg')
-        return 'ok'
+        return return_image()
 
 class SantaHat(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
+        save_image(request)
         # Read the image
-        image = cv2.imread('imageT.jpg')
+        image = cv2.imread(INPUT_IMAGE_NAME())
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         # Detect faces in the image
@@ -421,21 +403,19 @@ class SantaHat(Resource):
             minSize=(30, 30)
             #flags = cv2.CV_HAAR_SCALE_IMAGE
         )
-        background = Image.open('imageT.jpg')
+        background = Image.open(INPUT_IMAGE_NAME())
         foreground = Image.open(christmas_hat.png)
 
         for (x, y, w, h) in faces:
             img = add_hat(x,y,w,h,"SantaHat", background, foreground);
         img.save("SantaHat.jpg")
-        return 'ok'
+        return return_image()
 
 class FedoraHat(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
+        save_image(request)
         # Read the image
-        image = cv2.imread('imageT.jpg')
+        image = cv2.imread(INPUT_IMAGE_NAME())
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         # Detect faces in the image
@@ -446,14 +426,14 @@ class FedoraHat(Resource):
             minSize=(30, 30)
             #flags = cv2.CV_HAAR_SCALE_IMAGE
         )
-        background = Image.open('imageT.jpg')
+        background = Image.open(INPUT_IMAGE_NAME())
         foreground = Image.open('Fedora.png')
 
 
         for (x, y, w, h) in faces:
             img = add_hat(x,y,w,h,"FedoraHat", background, foreground);
         img.save("FedoraHat.jpg")
-        return 'ok'            
+        return return_image()            
 
 class Glasses(Resource):
     def post(self):
@@ -481,11 +461,9 @@ class Glasses(Resource):
 
 class DrawRectangles(Resource):
     def post(self):
-        f = codecs.open('imageT.jpg', 'wb')
-        f.write(request.data)
-        f.close()
+        save_image(request)
         # Read the image
-        image = cv2.imread('imageT.jpg')
+        image = cv2.imread(INPUT_IMAGE_NAME())
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         # Detect faces in the image
@@ -496,14 +474,14 @@ class DrawRectangles(Resource):
             minSize=(30, 30)
             #flags = cv2.CV_HAAR_SCALE_IMAGE
         )
-        background = Image.open('imageT.jpg')
+        background = Image.open(INPUT_IMAGE_NAME())
         foreground = Image.open('sunglass.png')
 
         for (x, y, w, h) in faces:
             cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
             cv2.rectangle(image, (x, y), (x+w, y+(h/2)), (0, 255, 0), 2)
         cv2.imwrite("drawrectangles.jpg", image)
-        return 'ok'
+        return return_image()
         
 api.add_resource(Departments_Meta, '/compress')
 api.add_resource(AlturaRuido, '/altura')
