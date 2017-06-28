@@ -16,10 +16,7 @@ from werkzeug import secure_filename
 reload(sys)  
 sys.setdefaultencoding('utf8')
 
-
 cascPath = "haarcascade_frontalface_default.xml"
-input_image_name = "input_image.jpg"
-output_image_name = "output_image.jpg"
 
 # Create the haar cascade
 faceCascade = cv2.CascadeClassifier(cascPath)
@@ -32,12 +29,18 @@ e = create_engine('sqlite:///salaries.db')
 app = Flask(__name__)
 api = Api(app)
 
+def INPUT_IMAGE_NAME():
+    return "input_image.jpg"
+
+def OUTPUT_IMAGE_NAME():
+    return "output_image.jpg"
+
 def save_image(request):
     f0 = request.files['file']
-    f0.save(secure_filename(input_image_name))
+    f0.save(secure_filename(INPUT_IMAGE_NAME()))
 
 def return_image():
-    send_file(output_image_name, mimetype='image/jpeg') 
+    return send_file(OUTPUT_IMAGE_NAME(), mimetype='image/jpeg') 
 
 def add_hat(x,y,w,h, hat_type, background, foreground):
     (width_b, height_b) = background.size   
@@ -457,7 +460,7 @@ class Glasses(Resource):
         save_image(request)
 
         # Read the image
-        image = cv2.imread('imageT.jpg')
+        image = cv2.imread(INPUT_IMAGE_NAME())
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         # Detect faces in the image
@@ -468,12 +471,12 @@ class Glasses(Resource):
             minSize=(30, 30)
             #flags = cv2.CV_HAAR_SCALE_IMAGE
         )
-        background = Image.open('imageT.jpg')
+        background = Image.open(INPUT_IMAGE_NAME())
         foreground = Image.open('sunglass.png')
 
         for (x, y, w, h) in faces:
             img = add_hat(x,y,w,h,"Glasses", background, foreground);
-        img.save("Glasses.jpg")
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()
 
 class DrawRectangles(Resource):
