@@ -259,7 +259,7 @@ class LarguraRuido(Resource):
         img = img.convert('RGB')
         img = iargb2gray(img)
         img = ruidoLargura(img)
-        img.save('ahu.bmp')
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()
 
 class AlturaRuido(Resource):
@@ -269,7 +269,7 @@ class AlturaRuido(Resource):
         img = img.convert('RGB')
         img = iargb2gray(img)
         img = ruidoAltura(img)
-        img.save('ahu.bmp')
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()
 
 class AmbosRuido(Resource):
@@ -279,7 +279,7 @@ class AmbosRuido(Resource):
         img = img.convert('RGB')
         img = iargb2gray(img)
         img = ruidoAmbos(img)
-        img.save('ambos.jpg')
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()
 
 class Mascara(Resource):
@@ -295,7 +295,7 @@ class Mascara(Resource):
         filtered = fftimg*mask
         img = iadftview(filtered)
         img = Image.fromarray(img)
-        img.save('mask.jpg')
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()
 
 
@@ -316,7 +316,7 @@ class Mf(Resource):
         img = iaidft(filtered)
         img = normalize(np.abs(img)).astype('uint8')
         img = Image.fromarray(img)
-        img.save('mf.jpg')
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()
 
 
@@ -328,7 +328,7 @@ class Filtragem(Resource):
         img = iaidft(img)
         img = normalize(np.abs(img)).astype('uint8')
         img = Image.fromarray(img)
-        img.save('ahu-filtered.jpg')
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()
 
 class Notch(Resource):
@@ -378,14 +378,14 @@ class Notch(Resource):
 
         img = iadftview(filtered)
         img = Image.fromarray(img)
-        img.save('mask.jpg')
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()
 
         #img = normalize(filtered).astype('uint8')
         img = iaidft(filtered)
         img = normalize(np.abs(img)).astype('uint8')
         img = Image.fromarray(img)
-        img.save('notch.jpg')
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()
 
 class SantaHat(Resource):
@@ -404,11 +404,11 @@ class SantaHat(Resource):
             #flags = cv2.CV_HAAR_SCALE_IMAGE
         )
         background = Image.open(INPUT_IMAGE_NAME())
-        foreground = Image.open(christmas_hat.png)
+        foreground = Image.open("christmas_hat.png")
 
         for (x, y, w, h) in faces:
             img = add_hat(x,y,w,h,"SantaHat", background, foreground);
-        img.save("SantaHat.jpg")
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()
 
 class FedoraHat(Resource):
@@ -432,7 +432,7 @@ class FedoraHat(Resource):
 
         for (x, y, w, h) in faces:
             img = add_hat(x,y,w,h,"FedoraHat", background, foreground);
-        img.save("FedoraHat.jpg")
+        img.save(OUTPUT_IMAGE_NAME())
         return return_image()            
 
 class Glasses(Resource):
